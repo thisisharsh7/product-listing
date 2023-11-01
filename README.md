@@ -1,5 +1,5 @@
 For running on your local system
-- Clone this repo using command -: git clone repo_url
+- Clone this repo using command -: git clone https://github.com/thisisharsh7/product-listing.git
 - then run command -: npm install )- in the root directory where your clone this repo
 - then run command -: npm run dev )- you can see that webpage is started on localhost:5173
 
