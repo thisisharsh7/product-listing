@@ -1,3 +1,4 @@
+import { useSelector } from 'react-redux';
 import Product from './Product';
 import styled from 'styled-components';
 
@@ -17,14 +18,21 @@ const GridContainer = styled.div`
 `;
 
 
-const ProductList = ({ count }) => {
-    const products = Array.from({ length: count }, (_, index) => (
-        <Product key={index} />
-    ));
+const ProductList = () => {
 
-    return <GridContainer>
-        {products}
-    </GridContainer>
+  const { data, cPage } = useSelector((state) => state.productReducer);
+
+
+  return <GridContainer>
+    {
+      data.length ? data.slice(cPage * 8, (cPage + 1) * 8).map((sdata, index) => {
+        return (
+          <Product key={index} name={sdata.name} price={sdata.price} description={sdata.description} img={sdata.imgSrc} />
+        )
+      })
+        : <div>No Items found.</div>
+    }
+  </GridContainer>
 };
 
 export default ProductList;

@@ -1,6 +1,9 @@
 
 import styled from 'styled-components';
 import { Icon } from '@iconify/react';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { SETDATA, SETPAGE } from '../state/reducers';
 
 const SearchBarContainer = styled.div`
   background-color: #fff; 
@@ -77,27 +80,92 @@ const SecSelect = styled.select`
 `;
 
 const SearchBar = () => {
-    return (
-        <SearchBarContainer>
-            <LogoImage>
-                <Icon icon="fontisto:shopping-store" />
-            </LogoImage>
-            <SearchInputGroup>
-                <SearchInput type="text" placeholder="Search..." />
-                <SearchButton><Icon icon="heroicons:magnifying-glass-20-solid" /></SearchButton>
-            </SearchInputGroup>
-            <FirstSelect>
-                <option value="All">All</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Clothing">Clothing</option>
-            </FirstSelect>
-            <SecSelect>
-                <option value="lowToHigh">Low to High</option>
-                <option value="highToLow">High to Low</option>
-            </SecSelect>
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedSorting, setSelectedSorting] = useState('Price');
+  const { data, rdata } = useSelector((state) => state.productReducer)
+  const dispatch = useDispatch();
+  const inputRef = useRef();
 
-        </SearchBarContainer>
-    );
+
+  const handleClick = () => {
+    const { value } = inputRef.current;
+    if (value) {
+      const filteredProduct = data.filter(product => product.name.toLowerCase().includes(value.toLowerCase()));
+      dispatch(SETDATA(filteredProduct));
+    }
+    inputRef.current.value = "";
+  }
+
+  const handleEnter = (e) => {
+    if (e.key === "Enter") {
+      handleClick();
+    }
+
+  }
+
+
+  const handleCategoryChange = (e) => {
+    const { value } = e.target;
+    setSelectedCategory(value);
+  };
+
+
+
+  const handleSortingChange = (e) => {
+    const { value } = e.target;
+    setSelectedSorting(value);
+  };
+
+  const handleSelect = () => {
+
+    const filteredProducts = selectedCategory === 'All'
+      ? rdata
+      : rdata.filter(product => product.category === selectedCategory);
+
+    const sortedProducts = [...filteredProducts];
+    if (selectedSorting === 'lowToHigh') {
+      sortedProducts.sort((a, b) => a.price - b.price);
+    } else if (selectedSorting === 'highToLow') {
+      sortedProducts.sort((a, b) => b.price - a.price);
+    } else {
+      sortedProducts.sort(() => Math.random() - 0.5);
+    }
+    dispatch(SETDATA(sortedProducts));
+  }
+
+
+  useEffect(() => {
+    handleSelect();
+  }, [selectedCategory, selectedSorting])
+
+
+
+  return (
+    <SearchBarContainer>
+      <LogoImage>
+        <Icon icon="fontisto:shopping-store" />
+      </LogoImage>
+      <SearchInputGroup>
+        <SearchInput type="text" placeholder="Search..." ref={inputRef} onKeyDown={handleEnter} />
+        <SearchButton onClick={handleClick}><Icon icon="heroicons:magnifying-glass-20-solid" /></SearchButton>
+      </SearchInputGroup>
+      <FirstSelect value={selectedCategory} onChange={handleCategoryChange}>
+        <option value="All">All</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Appliances">Appliances</option>
+        <option value="Footwear">Footwear</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Home & Garden">Home & Garden</option>
+        <option value="Gaming">Gaming</option>
+      </FirstSelect>
+      <SecSelect value={selectedSorting} onChange={handleSortingChange}>
+        <option value="Price">Price</option>
+        <option value="lowToHigh">Low to High</option>
+        <option value="highToLow">High to Low</option>
+      </SecSelect>
+
+    </SearchBarContainer>
+  );
 }
 
 export default SearchBar;

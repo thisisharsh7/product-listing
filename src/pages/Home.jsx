@@ -16,7 +16,7 @@ const Home = () => {
     return (
         <HomeContainer>
             <SearchBar />
-            <ProductList count={10} />
+            <ProductList/>
             <Pagination />
         </HomeContainer>
     );
